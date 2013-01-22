@@ -1,0 +1,5 @@
+#!/bin/bash
+echo "Index character: $1"
+echo "Original file pattern: $2"
+echo "Processed file pattern: $3"
+
