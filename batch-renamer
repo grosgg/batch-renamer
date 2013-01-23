@@ -3,3 +3,13 @@ echo "Index character: $1"
 echo "Original file pattern: $2"
 echo "Processed file pattern: $3"
 
+echo `expr match $2 $1`
+echo `expr index $2 $1`
+matching=`expr match "$2" "\(.*$1*.*\)"`
+
+if [ $matching == $2 ]
+then
+echo "Original file pattern contains index character"
+else
+echo "Original file pattern does not contain index character"
+fi
