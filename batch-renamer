@@ -1,15 +1,60 @@
 #!/bin/bash
-echo "Index character: $1"
+if [ $# -lt 5 ]
+then
+    echo "Error: You must supply 4 arguments"
+    exit 1
+fi
+
+echo "Index pattern: $1"
 echo "Original file pattern: $2"
 echo "Processed file pattern: $3"
+echo "Index start: $4"
+echo "Index start: $5"
 
-echo `expr match $2 $1`
-echo `expr index $2 $1`
-matching=`expr match "$2" "\(.*$1*.*\)"`
-
-if [ $matching == $2 ]
+if [[ $2 != *"$1"* ]]
 then
-echo "Original file pattern contains index character"
+    echo "Error: Original file pattern does not contain index pattern"
+    exit 1
 else
-echo "Original file pattern does not contain index character"
+    echo "Original file pattern contains index pattern"
 fi
+
+if [[ $3 != *"$1"* ]]
+then
+    echo "Error: Processed file pattern does not contain index pattern"
+    exit 1
+else
+    echo "Processed file pattern contains index pattern"
+fi
+
+digits=`expr length $1`
+echo "The pattern is based on $digits digits"
+
+i=$4
+total=`expr $5 - $4 + 1`
+success=0
+fail=0
+
+while [ $i -le $5 ]
+do
+    sequence=`printf %0"$digits"d $i`
+    original=`echo "$2" | sed "s/\$1/$sequence/"`
+    processed=`echo "$3" | sed "s/\$1/$sequence/"`
+
+    if test -f $original && test -w $original
+    then
+        mv $original $processed
+        echo "Renaming $original -> $processed"
+        success=`expr $success + 1`
+    else
+        echo "Sequence $sequence could not be processed"
+        fail=`expr $fail + 1`
+    fi
+
+    i=`expr $i + 1`
+done
+
+echo "$total files in total. $success successfully renamed. $fail failed."
+exit 0
+
+
